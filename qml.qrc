@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>res/Font Awesome 5 Free-Solid-900.otf</file>
+        <file>utils.js</file>
+        <file>AccountsListView.qml</file>
+        <file>SidePane.qml</file>
+        <file>DelayWork.qml</file>
+        <file>res/icon.ico</file>
+        <file>res/bitmap.png</file>
+        <file>AboutDialog.qml</file>
+        <file>AreUSureDialog.qml</file>
+        <file>FileDropArea.qml</file>
+    </qresource>
+</RCC>

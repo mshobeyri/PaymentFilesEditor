@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Project files
+
+*.pro.user
+bin/
+setup/pfe-cache/
+setup/pfe-SetupFiles/
+setup/Prerequisites/
+
