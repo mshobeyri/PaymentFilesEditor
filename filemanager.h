@@ -27,6 +27,7 @@ public:
 
 signals:
     void newElement(QString acNumber, double money);
+    void readError(QStringList readErrors);
 
 private:
     QString m_description;

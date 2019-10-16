@@ -7,6 +7,7 @@ import Qt.labs.platform 1.0 as QLP
 import "utils.js" as Util
 
 ApplicationWindow {
+    id: win
     visible: true
     width: 900
     height: 650
@@ -167,6 +168,9 @@ ApplicationWindow {
             imodel.append({"acnumber": acNumber,
                               "money": money})
         }
+        onReadError:{
+            ierrorDialog.openWithModel(readErrors)
+        }
     }
 
     FontLoader{
@@ -211,22 +215,6 @@ ApplicationWindow {
 
     ListModel {
         id: imodel
-//        ListElement{
-//            acnumber: "1"
-//            money:5546
-//        }
-//        ListElement{
-//            acnumber: "1"
-//            money:5546
-//        }
-//        ListElement{
-//            acnumber: "1"
-//            money:5546
-//        }
-//        ListElement{
-//            acnumber: "1"
-//            money:5546
-//        }
     }
     ListModel{
         id: isearchModel
@@ -237,6 +225,10 @@ ApplicationWindow {
     AreUSureDialog{
         id: iareuSureDialog
     }
+    ErrorDialog{
+        id: ierrorDialog
+    }
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 0

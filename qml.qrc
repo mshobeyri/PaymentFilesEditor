@@ -11,5 +11,6 @@
         <file>AboutDialog.qml</file>
         <file>AreUSureDialog.qml</file>
         <file>FileDropArea.qml</file>
+        <file>ErrorDialog.qml</file>
     </qresource>
 </RCC>
