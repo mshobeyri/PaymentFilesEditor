@@ -18,13 +18,14 @@ ApplicationWindow {
     property real totalPrice: 0
     property var currentRaw
     property string searchText: ""
+    property bool filterInvalids: false
     property string savePath: ""
     property bool anyThingRemovedInSearchMode: false
-    property bool searchMode: searchText!==""
+    property bool filterMode: searchText!=="" || filterInvalids
     property var openFiles: []
     property bool filesEdited: false
-    onSearchModeChanged: {
-        if(!searchMode){
+    onFilterModeChanged: {
+        if(!filterMode){
             removeMarkedElements()
         }
     }
@@ -81,6 +82,22 @@ ApplicationWindow {
         searchText = isidePane.searchBox.text
         idelayWork.doit(search)
     }
+    function viewInvalids(){
+        removeMarkedElements()
+        ibusyIndicator.running = true
+        isearchModel.clear()
+        ilistview.model = isearchModel
+        for(var i=0 ; i< imodel.count;i++){
+            var element = imodel.get(i)
+            if(!element.validAccount){
+                isearchModel.append({"acnumber": element.acnumber,
+                                        "money": element.money,
+                                        "validAccount": element.validAccount,
+                                        "mainindex":i})
+            }
+        }
+        ibusyIndicator.running = false
+    }
     function search(){
         for(var i=0 ; i< imodel.count;i++){
             var element = imodel.get(i)
@@ -88,6 +105,7 @@ ApplicationWindow {
                     || element.money.toString().indexOf(searchText)!==-1){
                 isearchModel.append({"acnumber": element.acnumber,
                                         "money": element.money,
+                                        "validAccount": element.validAccount,
                                         "mainindex":i})
             }
         }
@@ -116,7 +134,7 @@ ApplicationWindow {
                 filesEdited = false
                 fileManager.readFiles(openFiles)
                 ibusyIndicator.running = false
-                if(searchMode)searchElement()
+                if(filterMode)searchElement()
             }
 
             if(filesEdited){
@@ -130,7 +148,7 @@ ApplicationWindow {
             fileManager.readFiles(openFiles)
             ibusyIndicator.running = false
             if(imodel.count!==0)filesEdited = true
-            if(searchMode)searchElement()
+            if(filterMode)searchElement()
         }
     }
 
@@ -156,7 +174,26 @@ ApplicationWindow {
         ibusyIndicator.running = false
         filesEdited = false
     }
+    function validateACCN(accnumber){
+        var checksum = accnumber%100;
+        var number = Math.floor(accnumber/100)
+        var sum = 0
+        var numberstr = number+""
+        if(numberstr.length >10)
+            return false
+        while(numberstr.length<8){
+            numberstr = '0'+numberstr
+        }
+        for(var i=0;i<numberstr.length;i++){
+            var n = numberstr.charAt(i);
+            sum+= n*(i%2===0?3:7)
+        }
 
+        var add = 2 + Math.floor((sum+4)/97);
+
+        var res = (sum+add*2)%99;
+        return res === checksum;
+    }
     DelayWork{
         id: idelayWork
     }
@@ -166,7 +203,9 @@ ApplicationWindow {
         onNewElement:{
             totalPrice+=money
             imodel.append({"acnumber": acNumber,
-                              "money": money})
+                              "money": money,
+                              "validAccount":validateACCN(acNumber)
+                          })
         }
         onReadError:{
             ierrorDialog.openWithModel(readErrors)
@@ -245,7 +284,7 @@ ApplicationWindow {
                 openFiles = []
                 for(var i = 0;i<openedFilesPath.length;i++){
                     (openedFilesPath[i].indexOf(".pay")!==-1)
-                        openFiles.push(openedFilesPath[i].replace("file:///",""))
+                    openFiles.push(openedFilesPath[i].replace("file:///",""))
                 }
                 idelayWork.doit(openFile)
             }
@@ -263,7 +302,7 @@ ApplicationWindow {
                 openFiles = []
                 for(var i = 0;i<openedFilesPath.length;i++){
                     (openedFilesPath[i].indexOf(".pay")!==-1)
-                        openFiles.push(openedFilesPath[i].replace("file:///",""))
+                    openFiles.push(openedFilesPath[i].replace("file:///",""))
                 }
                 idelayWork.doit(openFile)
             }

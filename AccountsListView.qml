@@ -23,7 +23,7 @@ ListView {
         id: inoElementInSearch
         anchors.centerIn: parent
         text: "No Element Found"
-        visible: isearchModel.count === 0 && !ibusyIndicator.running && searchMode
+        visible: isearchModel.count === 0 && !ibusyIndicator.running && filterMode
         Universal.foreground: Universal.Cobalt
     }
 
@@ -63,8 +63,11 @@ ListView {
                             return
                         filesEdited = true
                         model.acnumber = text
-                        if(searchMode)
+                        model.validAccount = validateACCN(Number(text))
+                        if(filterMode){
                             imodel.setProperty(model.mainindex, "acnumber" , model.acnumber)
+                            imodel.setProperty(model.mainindex, "validAccount" , model.validAccount)
+                        }
                     }
                 }
 
@@ -73,7 +76,7 @@ ListView {
                 }
                 validator: RegExpValidator{regExp: /\d+/}
                 selectByMouse: true
-                color: text.length < 10? "red": "black"
+                color: model.validAccount?"black":"red"
             }
             TextField{
                 id: imoneyTextField
@@ -97,7 +100,7 @@ ListView {
                         text = Util.numberWithCommas(model.money)
                         totalPrice -= lastPrice
                         totalPrice += model.money
-                        if(searchMode)
+                        if(filterMode)
                             imodel.setProperty(model.mainindex, "money" , model.money)
                     }
                 }
@@ -116,7 +119,7 @@ ListView {
                 onClicked: {
                     totalPrice-= model.money
                     filesEdited = true
-                    if(searchMode){
+                    if(filterMode){
                         imodel.setProperty(model.mainindex,"removed",true)
                         anyThingRemovedInSearchMode = true
                         isearchModel.remove(model.index,1)

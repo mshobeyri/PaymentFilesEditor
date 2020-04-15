@@ -57,6 +57,7 @@ Pane{
                     placeholderText: "Search here..."
                     maximumLength: 20
                     selectByMouse: true
+                    enabled: !filterInvalids
                     onAccepted: {
                         searchElement()
                     }
@@ -94,6 +95,38 @@ Pane{
                     }
                     Label{
                         text: "Real Time Search"
+                        Layout.alignment: Qt.AlignVCenter
+                    }
+                }
+                Label{
+                    Layout.bottomMargin: -5
+                    Layout.topMargin: 10
+                    Universal.foreground: Universal.Cobalt
+                    font.pointSize: 12
+                    text: "Filter"
+                }
+                MenuSeparator{
+                    Layout.fillWidth: true
+                    leftPadding: 0
+                    rightPadding: 0
+                }
+                RowLayout{
+                    Switch{
+                        onCheckedChanged: {
+                            filterInvalids = checked
+                            if(checked){
+                                isearchTextField.text = ""
+                                viewInvalids()
+                            }
+                            else{
+                                removeMarkedElements()
+                                ilistview.model = imodel
+                            }
+
+                        }
+                    }
+                    Label{
+                        text: "Just Invalid ACC-Numbers"
                         Layout.alignment: Qt.AlignVCenter
                     }
                 }
@@ -185,7 +218,7 @@ Pane{
                 TextField{
                     id: ibankAccount
                     Layout.fillWidth: true
-                    color: text.length < 10? "red": "black"
+                    color: validateACCN(text)? "black":"red"
                     maximumLength: 10
                     inputMethodHints: Qt.ImhDigitsOnly
                     validator: RegExpValidator{regExp: /\d+/}
@@ -207,7 +240,7 @@ Pane{
                             imodel.insert(0,{"acnumber": ibankAccount.text,
                                               "money": Number(imoney.text)})
                             totalPrice+= Number(imoney.text)
-                            if(searchMode)searchElement()
+                            if(filterMode)searchElement()
                         }
                     }
                     Button{
@@ -218,7 +251,7 @@ Pane{
                             imodel.append({"acnumber": ibankAccount.text,
                                               "money": Number(imoney.text)})
                             totalPrice+= Number(imoney.text)
-                            if(searchMode)searchElement()
+                            if(filterMode)searchElement()
                         }
                     }
                 }
